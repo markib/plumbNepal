@@ -8,10 +8,9 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('../components/MapPinAddress', () => ({
-  default: ({ value, onChange }: { value: unknown; onChange: (next: unknown) => void }) => (
+  default: ({ onChange }: { onChange: (next: unknown) => void }) => (
     <input
       data-testid="map-pin"
-      value={JSON.stringify(value)}
       onChange={(event) => onChange(JSON.parse((event.target as HTMLInputElement).value))}
     />
   ),
@@ -185,6 +184,8 @@ describe('BookingPage', () => {
     });
   });
 });
+
+
 
 
 
