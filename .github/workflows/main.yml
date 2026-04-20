@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:15-3.4
+        env:
+          POSTGRES_DB: laravel_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d laravel_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      NODE_OPTIONS: --max-old-space-size=2048
+      APP_ENV: testing
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: laravel_test
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      CACHE_DRIVER: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Run frontend tests
+        run: npm test
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath, pdo, pdo_pgsql, xml, tokenizer, ctype, json
+
+      - name: Install backend dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
+
+      - name: Wait for PostgreSQL
+        run: |
+          for i in {1..10}; do
+            php -r "@\$pdo=new PDO('pgsql:host=127.0.0.1;port=5432;dbname=laravel_test','postgres','postgres'); echo 'ok'; exit(0);" && exit 0 || sleep 3
+          done
+          exit 1
+
+      - name: Run database migrations
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Run backend tests
+        run: php artisan test --configuration phpunit.ci.xml
+
+      - name: Composer security audit
+        run: composer audit --format=json
+
+      - name: NPM security audit
+        run: npm audit --audit-level=high
