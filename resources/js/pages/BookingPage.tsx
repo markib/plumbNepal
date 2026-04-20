@@ -83,9 +83,9 @@ const BookingPage: React.FC = () => {
     const contentType = response.headers.get('content-type') ?? '';
     if (contentType.includes('application/json')) {
       const data = await response.json();
-      const errorMessage =
-        data.message ||
-        (data.errors ? Object.values(data.errors).flat().join(' ') : undefined);
+      const errorMessage = data.errors
+        ? Object.values(data.errors).flat().join(' ')
+        : data.message;
       return errorMessage || t('bookingError');
     }
 

@@ -6,8 +6,13 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './vitest.setup.ts',
     include: ['resources/js/**/*.test.ts', 'resources/js/**/*.test.tsx'],
-    pool: 'forks',
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        minThreads: 1,
+        maxThreads: 1,
+      },
+    },
     isolate: true,
-    maxWorkers: 1,
   },
 });

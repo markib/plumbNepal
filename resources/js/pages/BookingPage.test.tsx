@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import BookingPage from './BookingPage';
@@ -61,7 +61,9 @@ describe('BookingPage', () => {
       expect(screen.getByRole('button', { name: /requestService/i })).toBeEnabled();
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /requestService/i }));
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: /requestService/i }));
+    });
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -94,7 +96,9 @@ describe('BookingPage', () => {
       expect(screen.getByRole('button', { name: /requestService/i })).toBeEnabled();
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /requestService/i }));
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: /requestService/i }));
+    });
 
     await waitFor(() => {
       expect(screen.getByText('The selected service type id is invalid.')).toBeInTheDocument();
@@ -126,7 +130,9 @@ describe('BookingPage', () => {
       expect(screen.getByRole('button', { name: /requestService/i })).toBeEnabled();
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /requestService/i }));
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: /requestService/i }));
+    });
 
     await waitFor(() => {
       expect(screen.getByText('The payment method field is required.')).toBeInTheDocument();
@@ -162,20 +168,23 @@ describe('BookingPage', () => {
     });
 
     const mapPinInput = screen.getByTestId('map-pin');
-    await userEvent.clear(mapPinInput);
-    await userEvent.type(mapPinInput, JSON.stringify({
+    fireEvent.change(mapPinInput, { target: { value: JSON.stringify({
       latitude: 'invalid-latitude',
       longitude: 'invalid-longitude',
       service_type_id: 1,
       is_emergency: false,
       payment_method: 'cod',
-    }));
+    }) } });
 
-    await userEvent.click(screen.getByRole('button', { name: /requestService/i }));
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: /requestService/i }));
+    });
 
     await waitFor(() => {
-      expect(screen.getByText('The latitude must be a number.')).toBeInTheDocument();
-      expect(screen.getByText('The longitude must be a number.')).toBeInTheDocument();
+      expect(screen.getByText('The latitude must be a number. The longitude must be a number.')).toBeInTheDocument();
     });
   });
 });
+
+
+
