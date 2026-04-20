@@ -76,3 +76,12 @@ jobs:
 
       - name: NPM security audit
         run: npm audit --audit-level=high
+
+  build-test-scan:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    strategy:
+      matrix:
+        php: [8.2]
+        node: [22]
