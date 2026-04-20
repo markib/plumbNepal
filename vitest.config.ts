@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './vitest.setup.ts',
     include: ['resources/js/**/*.test.ts', 'resources/js/**/*.test.tsx'],
-    threads: false,
+    pool: 'forks',
     isolate: true,
     maxWorkers: 1,
   },
