@@ -10,18 +10,18 @@ use Illuminate\Support\Facades\DB;
 
 class DispatchController extends Controller
 {
-    protected function findNearbyPlumbers(float $latitude, float $longitude, ?int $serviceTypeId = null, int $radius = 5000)
+    public function findNearbyPlumbers(float $latitude, float $longitude, ?int $serviceTypeId = null, int $radius = 5000)
     {
         $point = sprintf('SRID=4326;POINT(%s %s)', $longitude, $latitude);
 
         return PlumberProfile::with('user')->selectRaw(
-            'plumber_profiles.*, ST_DistanceSphere(location, ST_GeogFromText(?)) AS distance_meters',
+            'plumber_profiles.*, ST_Distance(location, ST_GeogFromText(?)) AS distance_meters',
             [$point]
         )
         ->where('is_available', true)
         ->where('verified', true)
         ->when($serviceTypeId, function ($query, $serviceTypeId) {
-            $query->whereRaw('? = ANY(service_type_ids)', [$serviceTypeId]);
+            $query->whereJsonContains('service_type_ids', $serviceTypeId);
         })
         ->whereRaw('ST_DWithin(location, ST_GeogFromText(?), ?)', [$point, $radius])
         ->orderBy('distance_meters', 'asc')

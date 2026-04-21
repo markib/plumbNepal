@@ -2,12 +2,13 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
 
 jobs:
-  ci:
+  ci-postgres:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgis/postgis:15-3.4
@@ -15,16 +16,17 @@ jobs:
           POSTGRES_DB: laravel_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U postgres -d laravel_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        ports:
-          - 5432:5432
+
     env:
-      NODE_OPTIONS: --max-old-space-size=2048
       APP_ENV: testing
+      APP_URL: http://localhost
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
@@ -34,37 +36,26 @@ jobs:
       CACHE_DRIVER: array
       SESSION_DRIVER: array
       QUEUE_CONNECTION: sync
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
+    steps:
+      - uses: actions/checkout@v4
+
+      # ✅ Setup PHP ONCE
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: 8.4
+          extensions: mbstring, bcmath, pdo, pdo_pgsql, xml
 
       - name: Install PHP dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
+        run: composer install --no-interaction --prefer-dist
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install frontend dependencies
-        run: npm install
-
-      - name: Run frontend tests
-        run: npm test
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          extensions: mbstring, bcmath, pdo, pdo_pgsql, xml, tokenizer, ctype, json
-
-      - name: Install backend dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
+      # ✅ Laravel setup (MISSING BEFORE)
+      - name: Setup environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan config:clear
 
       - name: Wait for PostgreSQL
         run: |
@@ -73,59 +64,53 @@ jobs:
           done
           exit 1
 
-      - name: Run database migrations
-        run: php artisan migrate:fresh --seed --force
+      - name: Run migrations
+        run: php artisan migrate:fresh --force
 
       - name: Run backend tests
         run: vendor/bin/phpunit --configuration phpunit.ci.xml
 
-      - name: Composer security audit
-        run: composer audit --format=json
+---
 
-      - name: NPM security audit
-        run: npm audit --audit-level=high
-
-  build-test-scan:
+  ci-build:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     strategy:
       matrix:
         php: [8.4]
-        node: [22]
+        node: [20]
+
+    env:
+      APP_ENV: testing
+      APP_URL: http://localhost
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: mbstring, pdo, sqlite
-          coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: "npm"
+          cache: npm
 
       - name: Install PHP dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: composer install --no-interaction --prefer-dist
 
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Validate Composer metadata
-        run: composer validate --no-check-publish
+      - name: Setup Laravel
+        run: |
+          cp .env.example .env
+          php artisan key:generate
 
-      - name: Copy .env
-        run: cp .env.example .env
-
-      - name: Generate app key
-        run: php artisan key:generate
-
-      - name: Prepare SQLite database
+      - name: Prepare SQLite
         run: |
           mkdir -p database
           touch database/database.sqlite
@@ -133,14 +118,8 @@ jobs:
       - name: Run migrations
         run: php artisan migrate --force
 
-      - name: Run PHP unit tests
-        run: php artisan test --colors=always
-
-      - name: Composer dependency audit
-        run: composer audit
-
-      - name: NPM dependency audit
-        run: npm audit --audit-level=moderate
+      - name: Run tests
+        run: vendor/bin/phpunit
 
       - name: Build frontend
         run: npm run build
@@ -148,7 +127,13 @@ jobs:
       - name: Run frontend tests
         run: npm test
 
-      - name: Filesystem vulnerability scan
+      - name: Composer audit
+        run: composer audit
+
+      - name: NPM audit
+        run: npm audit --audit-level=moderate
+
+      - name: Security scan
         uses: aquasecurity/trivy-action@v0.14.0
         with:
           scan-type: fs

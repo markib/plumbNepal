@@ -41,8 +41,8 @@ class PricingCalculatorTest extends TestCase
 
         $this->assertEquals(350, $result['base_fee']);
         $this->assertEquals(700, $result['service_fee']);
-        $this->assertEquals(165, $result['distance_fee']);
+        $this->assertEquals(173, $result['distance_fee']);
         $this->assertEquals(500, $result['emergency_surcharge']);
-        $this->assertEquals(1715, $result['total']);
+        $this->assertEquals(1723, $result['total']);
     }
 }

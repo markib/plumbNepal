@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\BookingStatus;
 use App\Models\ServiceType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,12 +12,6 @@ class BookingApiTest extends TestCase
 
     public function test_create_booking_returns_201_and_persists_data()
     {
-        BookingStatus::create([
-            'id' => 1,
-            'name' => 'Pending',
-            'description' => 'Pending booking',
-        ]);
-
         $serviceType = ServiceType::create([
             'name' => 'Pipe Repair',
             'description' => 'Fix leak and replace joints',
@@ -47,12 +40,6 @@ class BookingApiTest extends TestCase
 
     public function test_invalid_service_type_id_returns_422_with_specific_message()
     {
-        BookingStatus::create([
-            'id' => 1,
-            'name' => 'Pending',
-            'description' => 'Pending booking',
-        ]);
-
         $response = $this->postJson('/api/v1/bookings', [
             'service_type_id' => 9999,
             'latitude' => 27.7172,
@@ -66,12 +53,6 @@ class BookingApiTest extends TestCase
 
     public function test_missing_payment_method_returns_422_validation_error()
     {
-        BookingStatus::create([
-            'id' => 1,
-            'name' => 'Pending',
-            'description' => 'Pending booking',
-        ]);
-
         $serviceType = ServiceType::create([
             'name' => 'Pipe Repair',
             'description' => 'Fix leak and replace joints',
@@ -91,12 +72,6 @@ class BookingApiTest extends TestCase
 
     public function test_invalid_coordinates_return_422_validation_error()
     {
-        BookingStatus::create([
-            'id' => 1,
-            'name' => 'Pending',
-            'description' => 'Pending booking',
-        ]);
-
         $serviceType = ServiceType::create([
             'name' => 'Pipe Repair',
             'description' => 'Fix leak and replace joints',
@@ -112,7 +87,7 @@ class BookingApiTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonPath('errors.latitude.0', 'The latitude must be a number.')
-            ->assertJsonPath('errors.longitude.0', 'The longitude must be a number.');
+            ->assertJsonPath('errors.latitude.0', 'The latitude field must be a number.')
+            ->assertJsonPath('errors.longitude.0', 'The longitude field must be a number.');
     }
 }

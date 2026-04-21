@@ -11,6 +11,7 @@
     "laravel/tinker": "^3.0"
   },
   "require-dev": {
+    "mockery/mockery": "^1.5",
     "phpunit/phpunit": "^10.0"
   },
   "autoload": {
