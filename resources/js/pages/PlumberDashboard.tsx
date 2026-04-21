@@ -47,6 +47,7 @@ const PlumberDashboard: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [otpError, setOtpError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
@@ -87,6 +88,7 @@ const PlumberDashboard: React.FC = () => {
     setNotes('Include plumbing repair and material estimate');
     setShowModal(true);
     setError(null);
+    setSuccess(null);
   };
 
   const openOtpModal = (job: AssignedJob) => {
@@ -94,6 +96,49 @@ const PlumberDashboard: React.FC = () => {
     setOtpCode('');
     setOtpError(null);
     setShowOtpModal(true);
+  };
+
+  const openCompleteModal = (job: AssignedJob) => {
+    setSelectedCompleteJob(job);
+    setError(null);
+    setShowCompleteModal(true);
+  };
+
+  const submitQuote = async () => {
+    if (!selectedRequest) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(apiUrl(`/api/v1/bookings/${selectedRequest.id}/proposals`), {
+        method: 'POST',
+        headers: {
+          ...authHeaders(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          base_fee: Number(baseFee),
+          material_cost: Number(materialCost),
+          eta_minutes: Number(etaMinutes),
+          proposal_terms: { notes },
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setError(data?.message || 'Unable to send quote.');
+        return;
+      }
+
+      setSuccess('Quote sent successfully. The customer has been notified.');
+      setRequests((current) => current.filter((item) => item.id !== selectedRequest.id));
+      setShowModal(false);
+      setSelectedRequest(null);
+    } catch (err) {
+      setError('Unable to send quote.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const submitStartJob = async () => {
@@ -104,7 +149,10 @@ const PlumberDashboard: React.FC = () => {
     try {
       const response = await fetch(apiUrl(`/api/v1/bookings/${selectedJob.id}/start-job`), {
         method: 'POST',
-        headers: authHeaders(),
+        headers: {
+          ...authHeaders(),
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ contract_start_code: otpCode }),
       });
 
@@ -147,6 +195,36 @@ const PlumberDashboard: React.FC = () => {
     }
   };
 
+  const submitCompleteJob = async () => {
+    if (!selectedCompleteJob) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(apiUrl(`/api/v1/bookings/${selectedCompleteJob.id}/complete-job`), {
+        method: 'POST',
+        headers: {
+          ...authHeaders(),
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setError(data?.message || 'Unable to complete job.');
+        return;
+      }
+
+      setAssignedJobs((current) => current.filter((item) => item.id !== selectedCompleteJob.id));
+      setShowCompleteModal(false);
+      setSelectedCompleteJob(null);
+    } catch (err) {
+      setError('Unable to complete job.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="rounded-xl bg-white p-6 shadow-sm">
@@ -155,6 +233,12 @@ const PlumberDashboard: React.FC = () => {
           Nearby customer requests within your area will appear here. Select one to send a quote.
         </p>
       </div>
+
+      {success && (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-900">
+          {success}
+        </div>
+      )}
 
       {assignedJobs.length > 0 && (
         <div className="rounded-xl bg-white p-6 shadow-sm">
