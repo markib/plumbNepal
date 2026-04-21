@@ -77,7 +77,7 @@ jobs:
         run: php artisan migrate:fresh --seed --force
 
       - name: Run backend tests
-        run: php artisan test --configuration phpunit.ci.xml
+        run: vendor/bin/phpunit --configuration phpunit.ci.xml
 
       - name: Composer security audit
         run: composer audit --format=json
