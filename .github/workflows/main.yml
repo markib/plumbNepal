@@ -78,7 +78,7 @@ jobs:
     strategy:
       matrix:
         php: [8.4]
-        node: [20]
+        node: [22]
 
     env:
       APP_ENV: testing
