@@ -52,7 +52,7 @@ class BookingProposalController extends Controller
                 'service_types.name as service_type_name',
                 'users.name as customer_name'
             )
-            ->orderByRaw('ST_DistanceSphere(bookings.pickup_location, ST_GeogFromText(?))', [$point])
+            ->orderByRaw('ST_Distance(bookings.pickup_location, ST_GeogFromText(?))', [$point])
             ->limit(20)
             ->get();
 

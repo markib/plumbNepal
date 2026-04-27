@@ -47,6 +47,7 @@ interface JobOrder {
 }
 
 const CustomerProposalList: React.FC = () => {
+  const [proposals, setProposals] = useState<Proposal[]>([]);
   const [jobOrders, setJobOrders] = useState<JobOrder[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
