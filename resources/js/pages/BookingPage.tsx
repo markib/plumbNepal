@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import MapPinAddress from '../components/MapPinAddress';
 import { apiUrl } from '../utils/api';
 import type { BookingFormValues } from '../types';
+import { AIRequestInput } from '../components/AIRequestInput';
 
 interface ServiceTypeOption {
   id: number;
@@ -287,6 +288,8 @@ const BookingPage: React.FC = () => {
             onChange={(e) => setBooking({ ...booking, service_notes: e.target.value })}
           />
         </label>
+
+        <AIRequestInput/>
 
         <label className="flex items-center gap-3">
           <input

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\BookingProposalController;
 use App\Http\Controllers\Api\ServiceTypeController;
 use App\Http\Controllers\Api\VerificationController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\AiController;
 
 Route::prefix('v1')->group(function () {
     Route::post('auth/register', [AuthController::class, 'register']);
@@ -46,4 +47,7 @@ Route::prefix('v1')->group(function () {
         Route::post('payments/initiate', [PaymentController::class, 'initiate']);
         Route::post('payments/callback', [PaymentController::class, 'callback']);
     });
+
+    Route::post('/ai/diagnose', [AiController::class, 'diagnose']);
 });
+
