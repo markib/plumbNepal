@@ -28,7 +28,7 @@ class AiStorageService
                     'confidence' => $data['confidence'],
                     'summary' => $data['summary'],
                     'raw_response' => json_decode($data['raw'], true) ?? $data['raw'],
-                    'model_used' => $data['model'] ?? 'unknown',
+                    'model' => $data['model'] ?? 'unknown',
                     'prompt_version' => $data['prompt_version'] ?? 'v1',
                     'user_id' => auth()->id(), // Automatically link to the active user
                 ]);

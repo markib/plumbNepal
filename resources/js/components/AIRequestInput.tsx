@@ -8,12 +8,14 @@ interface AiResult {
   recommended_service: string;
   confidence: number;
   summary: string;
+  ai_diagnosis_id?: number;
 }
 
 interface ApiResponse {
   status: string;
   data: AiResult;
   message?: string;
+  ai_diagnosis_id?: number;
 }
 
 interface AIRequestInputProps {
@@ -25,11 +27,13 @@ export const AIRequestInput: React.FC<AIRequestInputProps> = ({ onAnalysisComple
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AiResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [diagnosisId, setDiagnosisId] = useState<number | null>(null);
 
   const handleAnalyze = async () => {
     setLoading(true);
     setError(null);
     setResult(null);
+    setDiagnosisId(null);
 
     try {
       const response = await fetch('/api/v1/ai/diagnose', {
@@ -44,23 +48,24 @@ export const AIRequestInput: React.FC<AIRequestInputProps> = ({ onAnalysisComple
       const data: ApiResponse = await response.json();
 
       if (!response.ok) {
-        // Now 'data' is defined, so we can safely access data.message
         throw new Error(data.message || 'Failed to analyze issue.');
       }
 
-      // Handle the successful data wrap { status: 'success', data: { ... } }
       const analysisResult = data.data;
       setResult(analysisResult);
+      setDiagnosisId(data.ai_diagnosis_id ?? null);
 
-      // Trigger callback to pre-fill the booking form if provided
+      // Pass both analysis result and diagnosis ID to parent
       if (onAnalysisComplete) {
-        onAnalysisComplete(analysisResult);
+        onAnalysisComplete({
+          ...analysisResult,
+          ai_diagnosis_id: data.ai_diagnosis_id
+        });
       }
     } catch (err: any) {
       console.error('AI Diagnosis Error:', err);
       setError(err.message || 'An unexpected error occurred. Please try again.');
     } finally {
-      // Correctly reset loading state here
       setLoading(false);
     }
   };

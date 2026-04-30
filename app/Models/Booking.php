@@ -29,6 +29,7 @@ class Booking extends Model
         'contract_start_code',
         'contracted_at',
         'pickup_location',
+        'ai_diagnosis_id',
     ];
 
     protected $casts = [
@@ -75,5 +76,10 @@ class Booking extends Model
     public function payment()
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public function aiDiagnosis()
+    {
+        return $this->belongsTo(AiDiagnosis::class);
     }
 }

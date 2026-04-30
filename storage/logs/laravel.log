@@ -1,10 +1,44 @@
-[2026-04-27 16:06:38] local.ERROR: AI Diagnostic Failure: cURL error 60: SSL certificate OpenSSL verify result: unable to get local issuer certificate (20) (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://openrouter.ai/api/v1/chat/completions  
-[2026-04-27 16:08:53] local.ERROR: AI Diagnostic Failure: NVIDIA API Error: {"error":{"message":"Missing Authentication header","code":401}}  
-[2026-04-27 16:09:57] local.ERROR: Failed to save AI Diagnosis: SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column "model" of relation "ai_diagnoses" violates not-null constraint
-DETAIL:  Failing row contains (2, 2026-04-27 16:09:57, 2026-04-27 16:09:57, pipe_leak, medium, 800.00, 2000.00, Plumber - Pipe Fix, 0.85, Leak at kitchen sink joint requires tightening or sealant replac..., null, null, v1.0). (Connection: pgsql, Host: 127.0.0.1, Port: 5432, Database: plumbnepal, SQL: insert into "ai_diagnoses" ("issue_type", "urgency", "price_min", "price_max", "service", "confidence", "summary", "prompt_version", "updated_at", "created_at") values (pipe_leak, medium, 800, 2000, Plumber - Pipe Fix, 0.85, Leak at kitchen sink joint requires tightening or sealant replacement., v1.0, 2026-04-27 16:09:57, 2026-04-27 16:09:57) returning "id")  
-[2026-04-27 16:09:57] local.ERROR: AI Storage Failed: SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column "model" of relation "ai_diagnoses" violates not-null constraint
-DETAIL:  Failing row contains (2, 2026-04-27 16:09:57, 2026-04-27 16:09:57, pipe_leak, medium, 800.00, 2000.00, Plumber - Pipe Fix, 0.85, Leak at kitchen sink joint requires tightening or sealant replac..., null, null, v1.0). (Connection: pgsql, Host: 127.0.0.1, Port: 5432, Database: plumbnepal, SQL: insert into "ai_diagnoses" ("issue_type", "urgency", "price_min", "price_max", "service", "confidence", "summary", "prompt_version", "updated_at", "created_at") values (pipe_leak, medium, 800, 2000, Plumber - Pipe Fix, 0.85, Leak at kitchen sink joint requires tightening or sealant replacement., v1.0, 2026-04-27 16:09:57, 2026-04-27 16:09:57) returning "id")  
-[2026-04-27 19:16:16] testing.ERROR: Failed to save AI Diagnosis: SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column "model" of relation "ai_diagnoses" violates not-null constraint
-DETAIL:  Failing row contains (1, 2026-04-27 19:16:16, 2026-04-27 19:16:16, pipe_leak, high, 500.00, 1500.00, Leak Repair, 0.9, Kitchen pipe is leaking., null, null, v1.0). (Connection: pgsql, Host: 127.0.0.1, Port: 5432, Database: plumbnepal, SQL: insert into "ai_diagnoses" ("issue_type", "urgency", "price_min", "price_max", "service", "confidence", "summary", "prompt_version", "updated_at", "created_at") values (pipe_leak, high, 500, 1500, Leak Repair, 0.9, Kitchen pipe is leaking., v1.0, 2026-04-27 19:16:16, 2026-04-27 19:16:16) returning "id")  
-[2026-04-27 19:16:17] testing.ERROR: AI Storage Failed: SQLSTATE[23502]: Not null violation: 7 ERROR:  null value in column "model" of relation "ai_diagnoses" violates not-null constraint
-DETAIL:  Failing row contains (1, 2026-04-27 19:16:16, 2026-04-27 19:16:16, pipe_leak, high, 500.00, 1500.00, Leak Repair, 0.9, Kitchen pipe is leaking., null, null, v1.0). (Connection: pgsql, Host: 127.0.0.1, Port: 5432, Database: plumbnepal, SQL: insert into "ai_diagnoses" ("issue_type", "urgency", "price_min", "price_max", "service", "confidence", "summary", "prompt_version", "updated_at", "created_at") values (pipe_leak, high, 500, 1500, Leak Repair, 0.9, Kitchen pipe is leaking., v1.0, 2026-04-27 19:16:16, 2026-04-27 19:16:16) returning "id")  
+[2026-04-30 03:36:50] local.INFO: Selected provider: ollama  
+[2026-04-30 03:49:56] local.INFO: Selected provider: ollama  
+[2026-04-30 03:50:56] local.ERROR: AI Diagnostic Failure: cURL error 28: Operation timed out after 60016 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for http://localhost:11434/api/generate  
+[2026-04-30 03:52:30] local.INFO: Selected provider: ollama  
+[2026-04-30 03:53:30] local.ERROR: AI Diagnostic Failure: cURL error 28: Operation timed out after 60010 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for http://localhost:11434/api/generate  
+[2026-04-30 03:59:10] local.WARNING: Provider ollama failed: cURL error 28: Operation timed out after 60015 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for http://localhost:11434/api/generate  
+[2026-04-30 03:59:10] local.INFO: Trying provider: ollama  
+[2026-04-30 03:59:10] local.WARNING: Provider failed: ollama - Unsupported cloud provider: ollama  
+[2026-04-30 03:59:10] local.WARNING: Provider openai error: All cloud providers failed  
+[2026-04-30 03:59:10] local.INFO: Trying provider: ollama  
+[2026-04-30 03:59:10] local.WARNING: Provider failed: ollama - Unsupported cloud provider: ollama  
+[2026-04-30 03:59:10] local.WARNING: Provider gemini error: All cloud providers failed  
+[2026-04-30 03:59:10] local.WARNING: Provider nvidia error: Unknown provider: nvidia  
+[2026-04-30 03:59:10] local.ERROR: AI Diagnostic Failure: All AI providers failed. Last error: Unknown provider: nvidia  
+[2026-04-30 14:13:14] local.WARNING: Ollama not available: cURL error 28: Connection timed out after 2001 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for http://localhost:11434/api/tags  
+[2026-04-30 14:13:14] local.WARNING: Provider ollama error: Ollama not available  
+[2026-04-30 14:13:14] local.INFO: Trying provider: ollama  
+[2026-04-30 14:13:14] local.WARNING: Provider failed: ollama - Unsupported cloud provider: ollama  
+[2026-04-30 14:13:14] local.WARNING: Provider openai error: All cloud providers failed  
+[2026-04-30 14:13:14] local.INFO: Trying provider: ollama  
+[2026-04-30 14:13:14] local.WARNING: Provider failed: ollama - Unsupported cloud provider: ollama  
+[2026-04-30 14:13:14] local.WARNING: Provider gemini error: All cloud providers failed  
+[2026-04-30 14:13:14] local.WARNING: Provider nvidia error: Unknown provider: nvidia  
+[2026-04-30 14:13:14] local.ERROR: AI Diagnostic Failure: All AI providers failed. Last error: Unknown provider: nvidia  
+[2026-04-30 14:24:05] local.WARNING: Provider ollama failed: cURL error 28: Operation timed out after 60006 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for http://localhost:11434/api/generate  
+[2026-04-30 14:24:05] local.INFO: Trying provider: openai  
+[2026-04-30 14:24:08] local.WARNING: OpenAI quota exceeded → switching...  
+[2026-04-30 14:24:08] local.INFO: Trying provider: gemini  
+[2026-04-30 14:24:17] local.INFO: Success with provider: gemini  
+[2026-04-30 14:44:58] local.WARNING: Provider ollama failed: cURL error 28: Operation timed out after 60002 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for http://localhost:11434/api/generate  
+[2026-04-30 14:44:58] local.INFO: Trying provider: openai  
+[2026-04-30 14:45:00] local.WARNING: OpenAI quota exceeded → switching...  
+[2026-04-30 14:45:00] local.INFO: Trying provider: gemini  
+[2026-04-30 14:45:16] local.WARNING: Provider failed: gemini - Gemini failed: {
+  "error": {
+    "code": 503,
+    "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+    "status": "UNAVAILABLE"
+  }
+}
+  
+[2026-04-30 14:45:16] local.WARNING: Provider openai error: All cloud providers failed  
+[2026-04-30 14:45:16] local.INFO: Trying provider: gemini  
+[2026-04-30 14:45:44] local.INFO: Success with provider: gemini  
