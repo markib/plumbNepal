@@ -19,6 +19,17 @@ interface NearbyPlumber {
   };
 }
 
+interface AiDiagnosisResult {
+  issue_type: string;
+  urgency: string;
+  estimated_price_min: number;
+  estimated_price_max: number;
+  recommended_service: string;
+  confidence: number;
+  summary: string;
+  ai_diagnosis_id?: number;
+}
+
 type NotificationType = 'success' | 'error';
 
 const BookingPage: React.FC = () => {
@@ -33,6 +44,7 @@ const BookingPage: React.FC = () => {
   const [nearbyPlumbers, setNearbyPlumbers] = useState<NearbyPlumber[]>([]);
   const [createdBookingId, setCreatedBookingId] = useState<number | null>(null);
   const [invitedPlumberId, setInvitedPlumberId] = useState<number | null>(null);
+  const [aiDiagnosis, setAiDiagnosis] = useState<AiDiagnosisResult | null>(null);
   const [booking, setBooking] = useState<BookingFormValues>({
     latitude: 27.7172,
     longitude: 85.3240,
@@ -280,16 +292,16 @@ const BookingPage: React.FC = () => {
           </label>
         </div>
 
-        <label className="block">
-          <span className="text-sm font-medium text-slate-700">{t('serviceNotes')}</span>
-          <textarea
-            className="mt-1 w-full min-h-[120px]"
-            value={booking.service_notes ?? ''}
-            onChange={(e) => setBooking({ ...booking, service_notes: e.target.value })}
-          />
-        </label>
-
-        <AIRequestInput/>
+        <AIRequestInput
+          onAnalysisComplete={(result) => {
+            setAiDiagnosis(result);
+            setBooking((prev) => ({
+              ...prev,
+              service_notes: result.summary,
+              ai_diagnosis_id: result.ai_diagnosis_id,
+            }));
+          }}
+        />
 
         <label className="flex items-center gap-3">
           <input
@@ -303,9 +315,9 @@ const BookingPage: React.FC = () => {
         <button
           type="submit"
           className="rounded bg-cyan-600 px-5 py-3 text-white hover:bg-cyan-700 disabled:cursor-not-allowed disabled:bg-slate-400"
-          disabled={isLoadingTypes || serviceTypes.length === 0 || booking.service_type_id === 0}
+          disabled={isLoadingTypes || serviceTypes.length === 0 || booking.service_type_id === 0 || createdBookingId !== null}
         >
-          {t('requestService')}
+          {createdBookingId ? t('bookingCreated') : t('requestService')}
         </button>
       </form>
     </section>

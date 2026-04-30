@@ -25,4 +25,5 @@ export interface BookingFormValues {
   service_notes?: string;
   is_emergency: boolean;
   payment_method: 'esewa' | 'khalti' | 'ime_pay' | 'cod';
+  ai_diagnosis_id?: number;
 }

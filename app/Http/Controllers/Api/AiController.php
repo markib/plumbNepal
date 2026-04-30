@@ -22,6 +22,8 @@ class AiController extends Controller
      */
     public function diagnose(DiagnoseRequest $request, AiStorageService $storageService): JsonResponse
     {
+        $diagnosisId = null;
+        
         try {
             $analysis = $this->aiService->analyze($request->validated('message'));
 
@@ -33,7 +35,7 @@ class AiController extends Controller
             // Silently store the result for analytics/history
             if ($confidence >= 0.4) {
                 try {
-                    $storageService->saveResult([
+                    $diagnosis = $storageService->saveResult([
                         'issue_type'     => $analysis['issue_type'] ?? 'General Plumbing',
                         'urgency'        => $analysis['urgency'] ?? 'Standard',
                         'price_min'      => $analysis['estimated_price_min'] ?? 0,
@@ -45,6 +47,7 @@ class AiController extends Controller
                         'model'          => 'qwen2.5:3b-ollama',
                         'prompt_version' => 'v1.0',
                     ]);
+                    $diagnosisId = $diagnosis->id;
                 } catch (\Exception $storageEx) {
                     // Log storage failure but don't stop the user's flow
                     Log::error("AI Storage Failed: " . $storageEx->getMessage());
@@ -53,7 +56,8 @@ class AiController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'data' => $analysis
+                'data' => $analysis,
+                'ai_diagnosis_id' => $diagnosisId,
             ]);
         } catch (\Exception $e) {
             return response()->json([
